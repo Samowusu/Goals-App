@@ -1,20 +1,68 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { useState } from "react";
+import { StyleSheet, View, Button, FlatList } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import GoalInput from "./components/GoalInput";
+import GoalItem from "./components/GoalItem";
 
 export default function App() {
+  const [courseGoals, setCourseGoals] = useState([]);
+  const [modalIsVisible, setModalIsVisible] = useState(false);
+
+  const addGoalHandler = (enteredGoalText) => {
+    setCourseGoals((prevGoals) => [
+      ...prevGoals,
+      { text: enteredGoalText, key: Math.random().toString() },
+    ]);
+    setModalIsVisible(false);
+  };
+
+  const deleteGoalHandler = (key) => {
+    setCourseGoals((prevGoals) => prevGoals.filter((goal) => goal.key !== key));
+  };
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <>
+      <StatusBar style="light" />
+      <View style={styles.appContainer}>
+        <GoalInput
+          onAddGoal={addGoalHandler}
+          visible={modalIsVisible}
+          setModalIsVisible={setModalIsVisible}
+        />
+        <Button
+          title="add new goal"
+          color={"#5e0acc"}
+          onPress={() => setModalIsVisible(true)}
+        />
+        <View style={styles.goalsContainer}>
+          <FlatList
+            alwaysBounceVertical={false}
+            data={courseGoals}
+            renderItem={({ item }) => {
+              return (
+                <GoalItem
+                  text={item.text}
+                  onDelete={deleteGoalHandler}
+                  id={item.key}
+                />
+              );
+            }}
+          />
+        </View>
+      </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  appContainer: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingTop: 50,
+    paddingHorizontal: 16,
+    backgroundColor: "#1e085a",
+  },
+
+  goalsContainer: {
+    flex: 5,
   },
 });
